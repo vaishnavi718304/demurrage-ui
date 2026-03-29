@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demurrage Platform | Upload & Extraction</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div>
+        <h1>Demurrage Settlement Intelligence</h1>
+        <p>Page 1 · Upload & Extraction</p>
+      </div>
+      <nav class="nav">
+        <a class="nav-link active" href="index.html">Upload & Extraction</a>
+        <a class="nav-link" href="#">Trigger Engine</a>
+        <a class="nav-link" href="#">Intelligence Layer</a>
+        <a class="nav-link" href="#">Decision Engine</a>
+      </nav>
+    </header>
+
+    <main class="main-grid">
+      <section class="card upload-card">
+        <h2>Input Documents</h2>
+        <p class="subtext">
+          Upload a Charter Party agreement and Statement of Facts for a single claim.
+        </p>
+
+        <div class="upload-group">
+          <label for="cpFile">Charter Party Agreement</label>
+          <input type="file" id="cpFile" accept=".pdf,.doc,.docx" />
+          <p class="hint">This upload will drive the live contract extraction.</p>
+        </div>
+
+        <div class="upload-group">
+          <label for="sofFile">Statement of Facts</label>
+          <input type="file" id="sofFile" accept=".pdf,.doc,.docx" />
+          <p class="hint">For v1, this will map to the prepared demo-backed voyage timeline.</p>
+        </div>
+
+        <button id="runBtn" class="primary-btn">Run Extraction</button>
+
+        <div id="statusBox" class="status-box">
+          Waiting for files.
+        </div>
+      </section>
+
+      <section class="card extracted-card">
+        <h2>Extracted Contract Terms</h2>
+        <div id="contractTerms" class="empty-state">
+          Upload files and run extraction to view Charter Party terms here.
+        </div>
+      </section>
+
+      <section class="card timeline-card">
+        <h2>Extracted Voyage Timeline</h2>
+        <div id="timelineOutput" class="empty-state">
+          Upload files and run extraction to view the voyage timeline here.
+        </div>
+      </section>
+
+      <section class="card notes-card">
+        <h2>What this page proves</h2>
+        <ul>
+          <li>The system accepts claim documents as inputs.</li>
+          <li>The Charter Party is converted into structured demurrage terms.</li>
+          <li>The SoF is shown as a structured voyage timeline for the case.</li>
+          <li>This becomes the foundation for triggers, feature logic, and settlement recommendation.</li>
+        </ul>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
