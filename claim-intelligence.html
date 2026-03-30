@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Demurrage Platform | Intelligence Layer</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="page">
+  <header class="topbar">
+    <div>
+      <h1>Demurrage Settlement Intelligence</h1>
+      <p>Page 3 · Intelligence Layer</p>
+    </div>
+    <nav class="nav">
+      <a class="nav-link" href="index.html">Upload & Extraction</a>
+      <a class="nav-link" href="contract-intelligence.html">Trigger Engine</a>
+      <a class="nav-link active" href="claim-intelligence.html">Intelligence Layer</a>
+      <a class="nav-link" href="decision-engine.html">Decision Engine</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="main-grid" style="margin-bottom: 18px;">
+      <section class="card" style="grid-column: 1 / -1;">
+        <h2>What this layer does</h2>
+        <p class="subtext" style="margin: 0;">
+          The Intelligence Layer converts raw operational signals — contract terms, voyage events, port behaviour, and trigger results — into structured ML-ready features.
+          These features feed the settlement prediction model and the ambiguity recovery system.
+        </p>
+      </section>
+    </div>
+
+    <div class="main-grid" style="margin-bottom: 18px;">
+      <section class="card" style="grid-column: 1 / 2;">
+        <h2>Feature Engineering</h2>
+        <p class="subtext">Structured signals built from contract terms, operational evidence, and trigger results. These become the model input vector.</p>
+        <div id="featureGrid" class="empty-state">
+          Run extraction on Page 1 to view engineered features here.
+        </div>
+      </section>
+
+      <section class="card" style="grid-column: 2 / 3;">
+        <h2>Ambiguous Contract Recovery</h2>
+        <p class="subtext">When key contract terms are missing or unclear, the system retrieves the most similar historical contract to infer a likely interpretation.</p>
+        <div id="ambiguityPanel" class="empty-state">
+          Ambiguity recovery results will appear here after extraction.
+        </div>
+        <div style="margin-top: 20px;">
+          <h3 style="font-size: 14px; margin: 0 0 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.3px;">Top Ambiguity Drivers</h3>
+          <div class="ambiguity-driver-list">
+            <div class="ambiguity-driver-item">
+              <span class="driver-rank">1</span>
+              <span class="driver-label">Missing demurrage currency</span>
+            </div>
+            <div class="ambiguity-driver-item">
+              <span class="driver-rank">2</span>
+              <span class="driver-label">Missing counting rule (SHINC / SHEX)</span>
+            </div>
+            <div class="ambiguity-driver-item">
+              <span class="driver-rank">3</span>
+              <span class="driver-label">Force majeure clause present</span>
+            </div>
+            <div class="ambiguity-driver-item">
+              <span class="driver-rank">4</span>
+              <span class="driver-label">Unclear laytime start trigger</span>
+            </div>
+            <div class="ambiguity-driver-item">
+              <span class="driver-rank">5</span>
+              <span class="driver-label">Missing demurrage rate</span>
+            </div>
+          </div>
+          <p class="hint" style="margin-top: 12px;">Source: Contract_Analysis — 73 real-world contracts across BP, Chevron, ExxonMobil.</p>
+        </div>
+      </section>
+    </div>
+
+    <div class="main-grid">
+      <section class="card" style="grid-column: 1 / 2;">
+        <h2>Port-Level Trigger Intelligence</h2>
+        <p class="subtext">Historical port behaviour modelled from 15,907 port calls across 462 ports.</p>
+        <div id="portPanel" class="empty-state">
+          Port intelligence will appear here after extraction.
+        </div>
+        <div style="margin-top: 20px;">
+          <h3 style="font-size: 14px; margin: 0 0 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.3px;">How Port Intelligence Works</h3>
+          <div class="intel-explain-grid">
+            <div class="intel-explain-item">
+              <div class="intel-explain-icon">📍</div>
+              <div>
+                <div class="intel-explain-title">Trigger Density</div>
+                <div class="intel-explain-text">How often a port generates T1–T14 trigger fires historically.</div>
+              </div>
+            </div>
+            <div class="intel-explain-item">
+              <div class="intel-explain-icon">📉</div>
+              <div>
+                <div class="intel-explain-title">Discount Tendency</div>
+                <div class="intel-explain-text">Whether counterparties at this port historically settle below the claimed amount.</div>
+              </div>
+            </div>
+            <div class="intel-explain-item">
+              <div class="intel-explain-icon">🔁</div>
+              <div>
+                <div class="intel-explain-title">Pattern Type</div>
+                <div class="intel-explain-text">Dominant operational pattern: congestion-driven, slow-ops, or event-dense.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" style="grid-column: 2 / 3;">
+        <h2>Voyage Timeline</h2>
+        <p class="subtext">Structured chronological evidence extracted from the Statement of Facts.</p>
+        <div id="timelineList" class="empty-state">
+          Voyage timeline will appear here after extraction.
+        </div>
+        <div style="margin-top: 20px;">
+          <h3 style="font-size: 14px; margin: 0 0 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.3px;">Key Event Types</h3>
+          <div class="event-type-list">
+            <div class="event-type-item">
+              <span class="event-dot" style="background: var(--accent);"></span>
+              <span>Vessel Arrived — starts the laytime clock under NOR+6h rule</span>
+            </div>
+            <div class="event-type-item">
+              <span class="event-dot" style="background: var(--accent-2);"></span>
+              <span>NOR Tendered — formal notice triggers laytime commencement</span>
+            </div>
+            <div class="event-type-item">
+              <span class="event-dot" style="background: #a78bfa;"></span>
+              <span>Mooring Start — vessel secured at berth, pre-ops begins</span>
+            </div>
+            <div class="event-type-item">
+              <span class="event-dot" style="background: #fbbf24;"></span>
+              <span>Cargo Start — loading or discharge operations commence</span>
+            </div>
+            <div class="event-type-item">
+              <span class="event-dot" style="background: var(--success);"></span>
+              <span>Cargo End — operations complete, laytime stops counting</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
