@@ -4,7 +4,7 @@
 // After Railway deployment, update RAILWAY_URL below.
 // ============================================================
 
-const RAILWAY_URL = "http://localhost:8080"; // ← UPDATE THIS after Railway deployment
+const RAILWAY_URL = "https://f4df-2-56-190-10.ngrok-free.app"; // ← UPDATE THIS after Railway deployment
 
 // ── Utility ──────────────────────────────────────────────────
 function escapeHtml(text) {
