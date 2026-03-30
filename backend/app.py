@@ -18,8 +18,9 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*", "allow_headers": "*", "expose_headers": "*"}})
 
 # ── Load model ─────────────────────────────────────────────────
-MODEL_PATH    = os.path.join(os.path.dirname(__file__), "demurrage_model.joblib")
-FEATURES_PATH = os.path.join(os.path.dirname(__file__), "model_features.json")
+BASE_DIR      = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH    = os.path.join(BASE_DIR, "demurrage_model.joblib")
+FEATURES_PATH = os.path.join(BASE_DIR, "model_features.json")
 
 model       = None
 model_feats = []
