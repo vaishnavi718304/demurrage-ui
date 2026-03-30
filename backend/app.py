@@ -431,7 +431,8 @@ def _cors_preflight():
     resp = jsonify({"ok": True})
     resp.headers["Access-Control-Allow-Origin"]  = "*"
     resp.headers["Access-Control-Allow-Methods"] = "POST, GET, OPTIONS"
-    resp.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    resp.headers["Access-Control-Allow-Headers"] = "*"
+    resp.headers["Access-Control-Max-Age"] = "3600"
     return resp
 
 
