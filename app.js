@@ -1,10 +1,8 @@
 // ============================================================
 // Demurrage Settlement Intelligence — app.js
-// Frontend on Vercel. Backend on Railway.
-// After Railway deployment, update RAILWAY_URL below.
 // ============================================================
 
-const RAILWAY_URL = "https://f4df-2-56-190-10.ngrok-free.app"; // ← UPDATE THIS after Railway deployment
+const RAILWAY_URL = "https://f4df-2-56-190-10.ngrok-free.app";
 
 // ── Utility ──────────────────────────────────────────────────
 function escapeHtml(text) {
@@ -16,6 +14,8 @@ function escapeHtml(text) {
 function fmt(val, d = 2)  { const n = parseFloat(val); return isNaN(n) ? "—" : n.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d }); }
 function fmtUSD(val)       { const n = parseFloat(val); return isNaN(n) ? "—" : "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 function fmtPct(val)       { const n = parseFloat(val); return isNaN(n) ? "—" : (n * 100).toFixed(1) + "%"; }
+
+const NGROK_HEADERS = { "ngrok-skip-browser-warning": "true" };
 
 function setStatus(msg, type = "") {
   const box = document.getElementById("statusBox");
@@ -52,7 +52,9 @@ function initPage1() {
 
     // ── Health check ──────────────────────────────────────────
     try {
-      const h  = await fetch(`${RAILWAY_URL}/health`);
+      const h  = await fetch(`${RAILWAY_URL}/health`, {
+        headers: NGROK_HEADERS
+      });
       const hj = await h.json();
       if (!hj.ok) throw new Error("backend not ready");
       setStatus(`Backend online${hj.model_loaded ? " · Model loaded ✓" : " · Running in fallback mode"}. Running contract extraction...`);
@@ -67,7 +69,11 @@ function initPage1() {
     try {
       const fd  = new FormData();
       fd.append("cp_file", cpFile);
-      const res  = await fetch(`${RAILWAY_URL}/extract_contract`, { method: "POST", body: fd });
+      const res  = await fetch(`${RAILWAY_URL}/extract_contract`, {
+        method: "POST",
+        body: fd,
+        headers: NGROK_HEADERS
+      });
       const json = await res.json();
       contractData = json.contract;
       renderContractTerms(contractData);
@@ -84,7 +90,11 @@ function initPage1() {
       const fd2  = new FormData();
       fd2.append("sof_file", sofFile);
       fd2.append("cp_file",  cpFile);
-      const res2 = await fetch(`${RAILWAY_URL}/process_claim`, { method: "POST", body: fd2 });
+      const res2 = await fetch(`${RAILWAY_URL}/process_claim`, {
+        method: "POST",
+        body: fd2,
+        headers: NGROK_HEADERS
+      });
       if (!res2.ok) {
         const err = await res2.json();
         throw new Error(err.error || "process_claim failed");
@@ -148,7 +158,6 @@ function initPage2() {
   const claim = loadClaim();
   if (!claim) return;
 
-  // Claim Context
   const ctx = document.getElementById("claimContext");
   if (ctx && claim.timeline) {
     const t      = claim.timeline;
@@ -166,7 +175,6 @@ function initPage2() {
     </div>`;
   }
 
-  // Demurrage Flag
   const flag = document.getElementById("demurrageFlagBadge");
   if (flag && claim.triggers) {
     const fired = claim.triggers.demurrage_flag;
@@ -182,7 +190,6 @@ function initPage2() {
     </div>`;
   }
 
-  // Trigger Grid
   const grid = document.getElementById("triggerGrid");
   if (grid && claim.triggers?.items) {
     grid.innerHTML = claim.triggers.items.map(t => `
@@ -203,7 +210,6 @@ function initPage3() {
   const claim = loadClaim();
   if (!claim) return;
 
-  // Feature Grid
   const fg = document.getElementById("featureGrid");
   if (fg && claim.features) {
     const f     = claim.features;
@@ -225,7 +231,6 @@ function initPage3() {
     </div>`;
   }
 
-  // Ambiguity Panel
   const ap = document.getElementById("ambiguityPanel");
   if (ap && claim.ambiguity_recovery) {
     const a = claim.ambiguity_recovery;
@@ -236,7 +241,6 @@ function initPage3() {
     </div>`;
   }
 
-  // Port Panel
   const pp = document.getElementById("portPanel");
   if (pp && claim.port_intelligence) {
     const p = claim.port_intelligence;
@@ -247,7 +251,6 @@ function initPage3() {
     </div>`;
   }
 
-  // Timeline
   const tl = document.getElementById("timelineList");
   if (tl && claim.timeline?.events) {
     tl.innerHTML = `<div class="timeline-list">
@@ -268,7 +271,6 @@ function initPage4() {
   if (!claim?.decision) return;
   const d = claim.decision;
 
-  // KPIs
   const kpi = document.getElementById("decisionKpis");
   if (kpi) {
     const aScore = parseFloat(d.ambiguity_score);
@@ -296,7 +298,6 @@ function initPage4() {
       </div>`;
   }
 
-  // Action
   const ap = document.getElementById("actionPanel");
   if (ap && d.recommended_action) {
     const action = d.recommended_action.toUpperCase();
@@ -310,7 +311,6 @@ function initPage4() {
     </div>`;
   }
 
-  // Reason codes
   const rp = document.getElementById("reasonPanel");
   if (rp && d.reason_codes) {
     const codes   = Array.isArray(d.reason_codes) ? d.reason_codes : d.reason_codes.split(",").map(s => s.trim());
