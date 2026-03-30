@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Demurrage Platform | Decision Engine</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="page">
+  <header class="topbar">
+    <div>
+      <h1>Demurrage Settlement Intelligence</h1>
+      <p>Page 4 · Decision Engine</p>
+    </div>
+    <nav class="nav">
+      <a class="nav-link" href="index.html">Upload & Extraction</a>
+      <a class="nav-link" href="contract-intelligence.html">Trigger Engine</a>
+      <a class="nav-link" href="claim-intelligence.html">Intelligence Layer</a>
+      <a class="nav-link active" href="decision-engine.html">Decision Engine</a>
+    </nav>
+  </header>
+
+  <main>
+
+    <section class="card" style="margin-bottom: 18px;">
+      <h2>Settlement Recommendation</h2>
+      <p class="subtext">RandomForest model · MAE 0.111 · R² 0.37 · trained on 2,880 labelled Chevron claims</p>
+      <div id="decisionKpis" class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Calculated Amount</div>
+          <div class="kpi-value kpi-neutral">—</div>
+          <div class="kpi-sub">From CP & SoF</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Predicted Settlement</div>
+          <div class="kpi-value kpi-accent">—</div>
+          <div class="kpi-sub">Model output</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Settlement Ratio</div>
+          <div class="kpi-value kpi-accent">—</div>
+          <div class="kpi-sub">Target: 0.98–1.02</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Ambiguity Score</div>
+          <div class="kpi-value kpi-warn">—</div>
+          <div class="kpi-sub">Threshold: 0.25 AUTO · 0.55 ESCALATE</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="main-grid" style="margin-bottom: 18px;">
+
+      <section class="card" style="grid-column: 1 / 2;">
+        <h2>Recommended Action</h2>
+        <p class="subtext">Determined by the automation policy engine based on predicted settlement ratio and ambiguity score.</p>
+        <div id="actionPanel" class="empty-state">
+          Recommended action will appear here after extraction.
+        </div>
+        <div style="margin-top: 22px;">
+          <h3 style="font-size: 14px; margin: 0 0 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.3px;">Policy Thresholds</h3>
+          <div class="threshold-list">
+            <div class="threshold-item">
+              <span class="action-badge badge-auto">AUTO</span>
+              <span class="threshold-rule">ratio 0.98–1.02 AND ambiguity &lt; 0.25</span>
+            </div>
+            <div class="threshold-item">
+              <span class="action-badge badge-review">REVIEW</span>
+              <span class="threshold-rule">ratio outside range OR ambiguity 0.25–0.55</span>
+            </div>
+            <div class="threshold-item">
+              <span class="action-badge badge-escalate">ESCALATE</span>
+              <span class="threshold-rule">ambiguity ≥ 0.55 OR missing events in SoF</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" style="grid-column: 2 / 3;">
+        <h2>Reason Codes</h2>
+        <p class="subtext">Machine-generated explanations for why the action was recommended.</p>
+        <div id="reasonPanel" class="empty-state">
+          Reason codes will appear here after extraction.
+        </div>
+        <div style="margin-top: 22px;">
+          <h3 style="font-size: 14px; margin: 0 0 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.3px;">Reason Code Reference</h3>
+          <div class="reason-ref-list">
+            <div class="reason-ref-item">
+              <span class="reason-chip chip-success">clean_case_high_recovery</span>
+              <span class="reason-ref-text">Ratio in AUTO range, low ambiguity → direct settlement eligible</span>
+            </div>
+            <div class="reason-ref-item">
+              <span class="reason-chip chip-warn">needs_human_check</span>
+              <span class="reason-ref-text">Prediction outside range → analyst review required</span>
+            </div>
+            <div class="reason-ref-item">
+              <span class="reason-chip chip-danger">high_ambiguity</span>
+              <span class="reason-ref-text">Ambiguity score ≥ 0.55 → contract uncertainty</span>
+            </div>
+            <div class="reason-ref-item">
+              <span class="reason-chip chip-danger">missing_events</span>
+              <span class="reason-ref-text">SoF has no recorded events → insufficient evidence</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="card">
+      <h2>Operator Decision</h2>
+      <p class="subtext">Review the recommendation above and select how to proceed. All actions are logged for audit purposes.</p>
+      <div class="operator-actions">
+        <button class="action-btn btn-auto" onclick="handleOperatorAction('AUTO')">
+          <span class="btn-icon">✓</span>
+          <span class="btn-label">Accept AUTO</span>
+          <span class="btn-sub">Direct send + auto-accept within range</span>
+        </button>
+        <button class="action-btn btn-review" onclick="handleOperatorAction('REVIEW')">
+          <span class="btn-icon">⟳</span>
+          <span class="btn-label">Send to REVIEW</span>
+          <span class="btn-sub">Assign to analyst for manual review</span>
+        </button>
+        <button class="action-btn btn-escalate" onclick="handleOperatorAction('ESCALATE')">
+          <span class="btn-icon">↑</span>
+          <span class="btn-label">ESCALATE Manually</span>
+          <span class="btn-sub">Senior analyst / legal review required</span>
+        </button>
+      </div>
+      <div id="operatorStatus" class="status-box" style="margin-top: 18px; display: none;"></div>
+      <div style="margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--border);">
+        <h3 style="font-size: 14px; margin: 0 0 8px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.3px;">What this page proves</h3>
+        <ul class="bullet-list">
+          <li>The system produces a structured, auditable settlement recommendation for every claim.</li>
+          <li>AUTO decisions (48.4% of processed claims) require no human involvement.</li>
+          <li>REVIEW and ESCALATE paths maintain analyst oversight where evidence is weak.</li>
+          <li>All outputs are traceable back to contract terms, trigger fires, and model features.</li>
+        </ul>
+      </div>
+    </section>
+
+  </main>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
