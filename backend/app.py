@@ -14,7 +14,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*", "allow_headers": "*", "expose_headers": "*"}})
 
 # ── Load model once at startup ─────────────────────────────────────────────────
 MODEL_PATH    = os.path.join(os.path.dirname(__file__), "model", "demurrage_model.joblib")
