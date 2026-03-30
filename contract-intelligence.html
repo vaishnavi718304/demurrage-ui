@@ -1,1 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Demurrage Platform | Trigger Engine</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="page">
+  <header class="topbar">
+    <div>
+      <h1>Demurrage Settlement Intelligence</h1>
+      <p>Page 2 · Trigger Engine</p>
+    </div>
+    <nav class="nav">
+      <a class="nav-link" href="index.html">Upload & Extraction</a>
+      <a class="nav-link active" href="contract-intelligence.html">Trigger Engine</a>
+      <a class="nav-link" href="claim-intelligence.html">Intelligence Layer</a>
+      <a class="nav-link" href="decision-engine.html">Decision Engine</a>
+    </nav>
+  </header>
 
+  <main>
+    <div class="main-grid" style="margin-bottom: 18px;">
+      <section class="card" style="grid-column: 1 / 2;">
+        <h2>Claim Context</h2>
+        <p class="subtext">Operational context extracted from the uploaded Statement of Facts and Charter Party.</p>
+        <div id="claimContext" class="empty-state">
+          Run extraction on Page 1 to populate claim context here.
+        </div>
+      </section>
+
+      <section class="card" style="grid-column: 2 / 3;">
+        <h2>Demurrage Determination</h2>
+        <p class="subtext">Whether this port call qualifies as a demurrage event based on trigger analysis.</p>
+        <div id="demurrageFlagBadge" class="empty-state">
+          Trigger results will appear here after extraction.
+        </div>
+        <div style="margin-top: 20px;">
+          <h3 style="font-size: 15px; margin: 0 0 14px; color: var(--text);">What this page proves</h3>
+          <ul class="bullet-list">
+            <li>Contract terms are benchmarked against operational events.</li>
+            <li>Each trigger has a plain-English rule and a fired/not-fired result.</li>
+            <li>The demurrage flag is the gating signal for the intelligence and decision layers.</li>
+            <li>Investors and reviewers can understand cause without reading code.</li>
+          </ul>
+        </div>
+      </section>
+    </div>
+
+    <section class="card" style="margin-bottom: 18px;">
+      <div class="panel-header">
+        <div>
+          <h2>Trigger Results</h2>
+          <p class="subtext" style="margin: 0;">Each trigger tests a specific operational condition against the contract terms.</p>
+        </div>
+      </div>
+      <div id="triggerGrid" class="trigger-grid">
+        <div class="trigger-card">
+          <div class="trigger-label">T1 · Laytime Breach</div>
+          <div class="trigger-desc">counted_hours > allowed_laytime</div>
+          <div class="trigger-value trigger-off">Awaiting data</div>
+        </div>
+        <div class="trigger-card">
+          <div class="trigger-label">T2 · Port Congestion</div>
+          <div class="trigger-desc">wait_to_berth > 0.25 × allowed</div>
+          <div class="trigger-value trigger-off">Awaiting data</div>
+        </div>
+        <div class="trigger-card">
+          <div class="trigger-label">T3 · Excess Pre-Ops Delay</div>
+          <div class="trigger-desc">pre_ops_gap > 0.25 × allowed</div>
+          <div class="trigger-value trigger-off">Awaiting data</div>
+        </div>
+        <div class="trigger-card">
+          <div class="trigger-label">T4 · Slow Cargo Ops</div>
+          <div class="trigger-desc">cargo_ops_hours > allowed</div>
+          <div class="trigger-value trigger-off">Awaiting data</div>
+        </div>
+        <div class="trigger-card">
+          <div class="trigger-label">T7 · Add-Hours Dominance</div>
+          <div class="trigger-desc">add ≥ allowed AND add/deduct ≥ 2</div>
+          <div class="trigger-value trigger-off">Awaiting data</div>
+        </div>
+        <div class="trigger-card">
+          <div class="trigger-label">T11 · High Event Density</div>
+          <div class="trigger-desc">≥ 8 events/day</div>
+          <div class="trigger-value trigger-off">Awaiting data</div>
+        </div>
+        <div class="trigger-card">
+          <div class="trigger-label">T14 · Arrival-to-Berth Delay</div>
+          <div class="trigger-desc">arrival_to_berth > 0.5 × allowed</div>
+          <div class="trigger-value trigger-off">Awaiting data</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Trigger Definitions — Plain English</h2>
+      <p class="subtext">These are the rules the system uses to detect causation. Each is derived directly from the Charter Party terms and the voyage timeline.</p>
+      <div class="rule-grid">
+        <div class="rule-card">
+          <div class="rule-id">T1</div>
+          <div class="rule-body">
+            <div class="rule-name">Laytime Breach</div>
+            <div class="rule-text">The total counted hours in port exceeded the allowed laytime granted in the Charter Party. This is the primary indicator of demurrage liability.</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rule-id">T2</div>
+          <div class="rule-body">
+            <div class="rule-name">Port Congestion</div>
+            <div class="rule-text">The vessel waited more than 25% of its allowed laytime just to reach a berth. This indicates port congestion contributed to the delay.</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rule-id">T3</div>
+          <div class="rule-body">
+            <div class="rule-name">Excess Pre-Operations Delay</div>
+            <div class="rule-text">Significant time passed between berth arrival and the start of cargo operations — exceeding 25% of allowed laytime.</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rule-id">T4</div>
+          <div class="rule-body">
+            <div class="rule-name">Slow Cargo Operations</div>
+            <div class="rule-text">The actual cargo loading or discharge operation took longer than the allowed laytime. A direct operational breach.</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rule-id">T7</div>
+          <div class="rule-body">
+            <div class="rule-name">Add-Hours Dominance</div>
+            <div class="rule-text">The volume of time added to laytime was at least as large as the full allowed laytime, and the add/deduct ratio was 2 or greater.</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rule-id">T11</div>
+          <div class="rule-body">
+            <div class="rule-name">High Event Density</div>
+            <div class="rule-text">The Statement of Facts recorded 8 or more events per day — indicating operational fragmentation or frequent interruptions.</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rule-id">T14</div>
+          <div class="rule-body">
+            <div class="rule-name">Arrival-to-Berth Delay</div>
+            <div class="rule-text">More than 50% of the allowed laytime elapsed between vessel arrival and actual berthing — a strong indicator of port-side responsibility.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
