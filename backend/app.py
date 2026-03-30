@@ -280,13 +280,29 @@ DEMO_CASES = {
 # ══════════════════════════════════════════════════════════════
 
 def detect_demo_case(file_bytes: bytes):
+    # Check 1 — raw bytes decode
     try:
         text = file_bytes.decode("utf-8", errors="ignore")
         for marker, case in DEMO_CASES.items():
             if marker in text:
+                print(f"Marker found in raw bytes: {marker}")
                 return marker, case
     except Exception:
         pass
+
+    # Check 2 — extracted PDF text
+    try:
+        pdf_text = extract_pdf_text(file_bytes)
+        print(f"PDF text extracted, length: {len(pdf_text)}")
+        print(f"Last 500 chars: {pdf_text[-500:]}")
+        for marker, case in DEMO_CASES.items():
+            if marker in pdf_text:
+                print(f"Marker found in PDF text: {marker}")
+                return marker, case
+    except Exception as e:
+        print(f"PDF text extraction error: {e}")
+
+    print("No marker found. Available markers:", list(DEMO_CASES.keys()))
     return None, None
 
 
