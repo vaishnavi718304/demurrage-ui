@@ -1,0 +1,7 @@
+{
+  "rewrites": [
+    { "source": "/contract-intelligence", "destination": "/contract-intelligence.html" },
+    { "source": "/claim-intelligence", "destination": "/claim-intelligence.html" },
+    { "source": "/decision-engine", "destination": "/decision-engine.html" }
+  ]
+}
