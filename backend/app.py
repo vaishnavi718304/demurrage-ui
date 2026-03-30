@@ -421,39 +421,24 @@ def compute_ambiguity_score(long_gap_ratio, has_events, unique_clause_count) -> 
 def predict_settlement(real_features: dict, calculated_amount: float):
     if model is not None and model_feats:
         full_row = {feat: 0 for feat in model_feats}
-        # Map real features to exact model feature names
-        feature_mapping = {
-            "calculated_amount":   "calculated_amount",
-            "total_events":        "total_events",
-            "long_gap_ratio":      "long_gap_ratio",
-            "unique_clause_count": "unique_clause_count",
-            "events_per_day":      "events_per_day",
-            "has_events":          "has_events",
-            "unique_event_keys":   "unique_event_keys",
-            "unique_event_types":  "unique_event_types",
-            "port_stay_hours":     "port_stay_hours",
-            "avg_gap_hours":       "avg_gap_hours",
-            "median_gap_hours":    "median_gap_hours",
-            "max_gap_hours":       "max_gap_hours",
-            "long_gap_count_6h":   "long_gap_count_6h",
-            "Metric Tonnes":       "Metric Tonnes",
-        }
-        for key, model_key in feature_mapping.items():
-            if key in real_features and model_key in full_row:
-                full_row[model_key] = real_features[key]
+        full_row.update(real_features)
 
-        print(f"Metric Tonnes going in: {full_row.get('Metric Tonnes', 'NOT FOUND')}")
-        print(f"calculated_amount: {full_row.get('calculated_amount')}")
+        print("Features going into model (non-zero):")
+        for col in model_feats:
+            val = full_row.get(col, 0)
+            if val != 0:
+                print(f"  {col}: {val}")
 
         X = pd.DataFrame([full_row])[model_feats].fillna(0)
         ratio = float(model.predict(X)[0])
         ratio = min(max(ratio, 0.0), 1.5)
         print(f"Model predicted ratio: {ratio}")
+        print(f"Action would be: {'AUTO' if 0.98 <= ratio <= 1.02 else 'REVIEW'}")
     else:
         ambiguity = real_features.get("ambiguity_score", 0.5)
         ratio = max(0.75, 1.0 - ambiguity * 0.3)
-    return round(ratio, 6), round(ratio * calculated_amount, 2)
 
+    return round(ratio, 6), round(ratio * calculated_amount, 2)
 
 def decide_action(pred_ratio, ambiguity, has_events):
     # Exact thresholds from Automation_Desicion.ipynb
