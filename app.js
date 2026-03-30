@@ -46,6 +46,8 @@ function initPage1() {
       setStatus("Please upload both a Charter Party and a Statement of Facts file.", "error-state");
       return;
     }
+    // ── Clear previous claim data immediately ──
+    localStorage.clear();
 
     setStatus("Connecting to backend...");
     runBtn.disabled = true;
