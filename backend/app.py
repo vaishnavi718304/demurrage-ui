@@ -1,7 +1,7 @@
 """
 Demurrage Settlement Intelligence — Flask Backend
 All 4 real cases verified against actual model predictions.
-Case 5 (no demurrage) is synthetic and clearly labelled.
+Case 5 (no demurrage) and Case 6 (escalate) are synthetic.
 """
 
 import os
@@ -31,14 +31,12 @@ def load_model():
         with open(FEATURES_PATH) as f:
             model_feats = json.load(f)
         print("✅ Model loaded")
+        print("✅ Features:", model_feats)
     else:
         print("⚠️  Model not found — using rule-based fallback")
 
 load_model()
 
-# ══════════════════════════════════════════════════════════════
-# CHEVRON GTC CONTRACT TERMS
-# ══════════════════════════════════════════════════════════════
 CHEVRON_CONTRACT = {
     "source_file":                "Chevron2014ProductsGTC.pdf",
     "allowed_laytime":            "36 hours SHINC",
@@ -61,23 +59,19 @@ NOR_OFFSET_HOURS      = 6.0
 
 # ══════════════════════════════════════════════════════════════
 # DEMO CASES
-# Cases 1-4: Real dataset rows, real model predictions verified
-# Case 5: Synthetic — clearly labelled
 # ══════════════════════════════════════════════════════════════
 DEMO_CASES = {
 
-    # ── Case 1 — AUTO (FORCADOS, id 7705) ─────────────────────
-    # REAL: pred_ratio=1.018, ambiguity=0.125, action=AUTO
-    # Verified against real model with complete features
+    # Case 1 — AUTO (FORCADOS, id 7705)
+    # REAL: verified ratio 1.018, ambiguity 0.125, action AUTO
     "DEMURRAGE-DEMO-FORCADOS-AUTO": {
-        "port_name":            "FORCADOS",
-        "operation":            "load",
-        "vessel":               "CHIOS",
-        "calculated_amount":    1893472.01,
-        "unique_clause_count":  1.0,
-        "is_real":              True,
-        "dataset_id":           7705,
-        "expected_action":      "AUTO",
+        "port_name":           "FORCADOS",
+        "operation":           "load",
+        "vessel":              "CHIOS",
+        "calculated_amount":   1893472.01,
+        "unique_clause_count": 1.0,
+        "is_real":             True,
+        "dataset_id":          7705,
         "real_features": {
             "calculated_amount":   1893472.01,
             "total_events":        12.0,
@@ -95,33 +89,31 @@ DEMO_CASES = {
             "Metric Tonnes":       126738.0,
         },
         "events": [
-            {"event_name": "Vessel Arrived",         "event_key": "vessel_arrived",  "timestamp": "2025-05-12 06:00:00"},
-            {"event_name": "NOR Tendered",           "event_key": "nor_tendered",    "timestamp": "2025-05-12 06:30:00"},
-            {"event_name": "Vessel Berthed",         "event_key": "mooring_start",   "timestamp": "2025-05-12 08:00:00"},
-            {"event_name": "Hoses Connected",        "event_key": "hoses_connected", "timestamp": "2025-05-12 09:00:00"},
-            {"event_name": "Cargo Load Commenced",   "event_key": "cargo_start",     "timestamp": "2025-05-12 10:00:00"},
-            {"event_name": "Cargo Stopped",          "event_key": "cargo_stopped",   "timestamp": "2025-05-12 16:00:00"},
-            {"event_name": "Cargo Resumed",          "event_key": "cargo_resumed",   "timestamp": "2025-05-12 18:00:00"},
-            {"event_name": "Cargo Stopped",          "event_key": "cargo_stopped_2", "timestamp": "2025-05-13 02:00:00"},
-            {"event_name": "Cargo Resumed",          "event_key": "cargo_resumed_2", "timestamp": "2025-05-13 04:00:00"},
-            {"event_name": "Cargo Stopped",          "event_key": "cargo_stopped_3", "timestamp": "2025-05-13 10:00:00"},
-            {"event_name": "Cargo Resumed",          "event_key": "cargo_resumed_3", "timestamp": "2025-05-13 12:00:00"},
-            {"event_name": "Cargo Load Completed",   "event_key": "cargo_end",       "timestamp": "2025-05-15 15:00:00"},
+            {"event_name": "Vessel Arrived",        "event_key": "vessel_arrived",  "timestamp": "2025-05-12 06:00:00"},
+            {"event_name": "NOR Tendered",          "event_key": "nor_tendered",    "timestamp": "2025-05-12 06:30:00"},
+            {"event_name": "Vessel Berthed",        "event_key": "mooring_start",   "timestamp": "2025-05-12 08:00:00"},
+            {"event_name": "Hoses Connected",       "event_key": "hoses_connected", "timestamp": "2025-05-12 09:00:00"},
+            {"event_name": "Cargo Load Commenced",  "event_key": "cargo_start",     "timestamp": "2025-05-12 10:00:00"},
+            {"event_name": "Cargo Stopped",         "event_key": "cargo_stopped",   "timestamp": "2025-05-12 16:00:00"},
+            {"event_name": "Cargo Resumed",         "event_key": "cargo_resumed",   "timestamp": "2025-05-12 18:00:00"},
+            {"event_name": "Cargo Stopped",         "event_key": "cargo_stopped_2", "timestamp": "2025-05-13 02:00:00"},
+            {"event_name": "Cargo Resumed",         "event_key": "cargo_resumed_2", "timestamp": "2025-05-13 04:00:00"},
+            {"event_name": "Cargo Stopped",         "event_key": "cargo_stopped_3", "timestamp": "2025-05-13 10:00:00"},
+            {"event_name": "Cargo Resumed",         "event_key": "cargo_resumed_3", "timestamp": "2025-05-13 12:00:00"},
+            {"event_name": "Cargo Load Completed",  "event_key": "cargo_end",       "timestamp": "2025-05-15 15:00:00"},
         ]
     },
 
-    # ── Case 2 — AUTO (PUERTO BAYOVAR, id 6447) ───────────────
-    # REAL: pred_ratio=1.017, ambiguity=0.080, action=AUTO
-    # Verified against real model with complete features
+    # Case 2 — AUTO (PUERTO BAYOVAR, id 6447)
+    # REAL: verified ratio 1.017, ambiguity 0.080, action AUTO
     "DEMURRAGE-DEMO-BAYOVAR-AUTO": {
-        "port_name":            "PUERTO BAYOVAR",
-        "operation":            "discharge",
-        "vessel":               "NAVE ARIADNE",
-        "calculated_amount":    1736014.59,
-        "unique_clause_count":  0.0,
-        "is_real":              True,
-        "dataset_id":           6447,
-        "expected_action":      "AUTO",
+        "port_name":           "PUERTO BAYOVAR",
+        "operation":           "discharge",
+        "vessel":              "NAVE ARIADNE",
+        "calculated_amount":   1736014.59,
+        "unique_clause_count": 0.0,
+        "is_real":             True,
+        "dataset_id":          6447,
         "real_features": {
             "calculated_amount":   1736014.59,
             "total_events":        10.0,
@@ -139,31 +131,29 @@ DEMO_CASES = {
             "Metric Tonnes":       25000.0,
         },
         "events": [
-            {"event_name": "Vessel Arrived",          "event_key": "vessel_arrived",  "timestamp": "2025-07-01 06:00:00"},
-            {"event_name": "NOR Tendered",            "event_key": "nor_tendered",    "timestamp": "2025-07-01 06:30:00"},
-            {"event_name": "Vessel Berthed",          "event_key": "mooring_start",   "timestamp": "2025-07-01 08:00:00"},
-            {"event_name": "Hoses Connected",         "event_key": "hoses_connected", "timestamp": "2025-07-01 09:00:00"},
-            {"event_name": "Cargo Discharge Commenced","event_key": "cargo_start",    "timestamp": "2025-07-01 10:00:00"},
-            {"event_name": "Cargo Stopped",           "event_key": "cargo_stopped",   "timestamp": "2025-07-01 16:00:00"},
-            {"event_name": "Cargo Resumed",           "event_key": "cargo_resumed",   "timestamp": "2025-07-01 18:00:00"},
-            {"event_name": "Cargo Stopped",           "event_key": "cargo_stopped_2", "timestamp": "2025-07-02 02:00:00"},
-            {"event_name": "Cargo Resumed",           "event_key": "cargo_resumed_2", "timestamp": "2025-07-02 04:00:00"},
-            {"event_name": "Cargo Completed",         "event_key": "cargo_end",       "timestamp": "2025-07-03 19:12:00"},
+            {"event_name": "Vessel Arrived",           "event_key": "vessel_arrived",  "timestamp": "2025-07-01 06:00:00"},
+            {"event_name": "NOR Tendered",             "event_key": "nor_tendered",    "timestamp": "2025-07-01 06:30:00"},
+            {"event_name": "Vessel Berthed",           "event_key": "mooring_start",   "timestamp": "2025-07-01 08:00:00"},
+            {"event_name": "Hoses Connected",          "event_key": "hoses_connected", "timestamp": "2025-07-01 09:00:00"},
+            {"event_name": "Cargo Discharge Commenced","event_key": "cargo_start",     "timestamp": "2025-07-01 10:00:00"},
+            {"event_name": "Cargo Stopped",            "event_key": "cargo_stopped",   "timestamp": "2025-07-01 16:00:00"},
+            {"event_name": "Cargo Resumed",            "event_key": "cargo_resumed",   "timestamp": "2025-07-01 18:00:00"},
+            {"event_name": "Cargo Stopped",            "event_key": "cargo_stopped_2", "timestamp": "2025-07-02 02:00:00"},
+            {"event_name": "Cargo Resumed",            "event_key": "cargo_resumed_2", "timestamp": "2025-07-02 04:00:00"},
+            {"event_name": "Cargo Completed",          "event_key": "cargo_end",       "timestamp": "2025-07-03 19:12:00"},
         ]
     },
 
-    # ── Case 3 — REVIEW (HOUSTON TX, id 6446) ─────────────────
-    # REAL: pred_ratio=1.020, ambiguity=0.183, action=REVIEW
-    # Verified against real model with complete features
+    # Case 3 — REVIEW (HOUSTON TX, id 6446)
+    # REAL: verified ratio 1.020, ambiguity 0.183, action REVIEW
     "DEMURRAGE-DEMO-HOUSTON-REVIEW": {
-        "port_name":            "HOUSTON TX",
-        "operation":            "load",
-        "vessel":               "NAVE ARIADNE",
-        "calculated_amount":    1736014.59,
-        "unique_clause_count":  2.0,
-        "is_real":              True,
-        "dataset_id":           6446,
-        "expected_action":      "REVIEW",
+        "port_name":           "HOUSTON TX",
+        "operation":           "load",
+        "vessel":              "NAVE ARIADNE",
+        "calculated_amount":   1736014.59,
+        "unique_clause_count": 2.0,
+        "is_real":             True,
+        "dataset_id":          6446,
         "real_features": {
             "calculated_amount":   1736014.59,
             "total_events":        12.0,
@@ -196,18 +186,16 @@ DEMO_CASES = {
         ]
     },
 
-    # ── Case 4 — REVIEW (TALARA, id 6448) ─────────────────────
-    # REAL: pred_ratio=0.955, ambiguity=0.272, action=REVIEW
-    # Verified against real model with complete features
+    # Case 4 — REVIEW (TALARA, id 6448)
+    # REAL: verified ratio 0.955, ambiguity 0.272, action REVIEW
     "DEMURRAGE-DEMO-TALARA-REVIEW": {
-        "port_name":            "TALARA",
-        "operation":            "discharge",
-        "vessel":               "NAVE ARIADNE",
-        "calculated_amount":    1736014.59,
-        "unique_clause_count":  0.0,
-        "is_real":              True,
-        "dataset_id":           6448,
-        "expected_action":      "REVIEW",
+        "port_name":           "TALARA",
+        "operation":           "discharge",
+        "vessel":              "NAVE ARIADNE",
+        "calculated_amount":   1736014.59,
+        "unique_clause_count": 0.0,
+        "is_real":             True,
+        "dataset_id":          6448,
         "real_features": {
             "calculated_amount":   1736014.59,
             "total_events":        22.0,
@@ -225,51 +213,70 @@ DEMO_CASES = {
             "Metric Tonnes":       25000.0,
         },
         "events": [
-            {"event_name": "Vessel Arrived",                         "event_key": "vessel_arrived",  "timestamp": "2025-06-15 08:00:00"},
-            {"event_name": "NOR Tendered",                           "event_key": "nor_tendered",    "timestamp": "2025-06-15 08:30:00"},
-            {"event_name": "Waiting for Berth",                      "event_key": "waiting_berth",   "timestamp": "2025-06-15 09:00:00"},
-            {"event_name": "Vessel Berthed",                         "event_key": "mooring_start",   "timestamp": "2025-06-18 14:00:00"},
-            {"event_name": "Hoses Connected",                        "event_key": "hoses_connected", "timestamp": "2025-06-18 16:00:00"},
-            {"event_name": "Cargo Discharge Commenced",              "event_key": "cargo_start",     "timestamp": "2025-06-18 18:00:00"},
-            {"event_name": "Cargo Stopped — Equipment Failure",      "event_key": "cargo_stopped",   "timestamp": "2025-06-22 06:00:00"},
-            {"event_name": "Cargo Resumed After Repairs",            "event_key": "cargo_resumed",   "timestamp": "2025-06-26 10:00:00"},
-            {"event_name": "Cargo Stopped — Force Majeure",          "event_key": "weather_stop",    "timestamp": "2025-06-30 14:00:00"},
-            {"event_name": "Cargo Resumed Post Weather",             "event_key": "cargo_resumed_2", "timestamp": "2025-07-05 08:00:00"},
-            {"event_name": "Cargo Stopped — Customs Inspection",     "event_key": "customs_stop",    "timestamp": "2025-07-10 12:00:00"},
-            {"event_name": "Customs Cleared — Cargo Resumed",        "event_key": "cargo_resumed_3", "timestamp": "2025-07-13 09:00:00"},
-            {"event_name": "Cargo Stopped — Tank Capacity Issue",    "event_key": "cargo_stopped_3", "timestamp": "2025-07-17 16:00:00"},
-            {"event_name": "Cargo Resumed",                          "event_key": "cargo_resumed_4", "timestamp": "2025-07-24 10:00:00"},
-            {"event_name": "Cargo Stopped — Shift Dispute",          "event_key": "cargo_stopped_4", "timestamp": "2025-07-28 06:00:00"},
-            {"event_name": "Cargo Resumed",                          "event_key": "cargo_resumed_5", "timestamp": "2025-08-01 14:00:00"},
-            {"event_name": "Cargo Stopped — Pipeline Pressure",      "event_key": "cargo_stopped_5", "timestamp": "2025-08-05 08:00:00"},
-            {"event_name": "Cargo Resumed",                          "event_key": "cargo_resumed_6", "timestamp": "2025-08-10 16:00:00"},
-            {"event_name": "Cargo Stopped — Metering Dispute",       "event_key": "cargo_stopped_6", "timestamp": "2025-08-14 10:00:00"},
-            {"event_name": "Cargo Resumed",                          "event_key": "cargo_resumed_7", "timestamp": "2025-08-14 12:00:00"},
-            {"event_name": "Final Cargo Completed",                  "event_key": "cargo_end",       "timestamp": "2025-08-15 10:48:00"},
-            {"event_name": "Hoses Disconnected",                     "event_key": "hoses_off",       "timestamp": "2025-08-15 12:00:00"},
+            {"event_name": "Vessel Arrived",                        "event_key": "vessel_arrived",  "timestamp": "2025-06-15 08:00:00"},
+            {"event_name": "NOR Tendered",                          "event_key": "nor_tendered",    "timestamp": "2025-06-15 08:30:00"},
+            {"event_name": "Waiting for Berth",                     "event_key": "waiting_berth",   "timestamp": "2025-06-15 09:00:00"},
+            {"event_name": "Vessel Berthed",                        "event_key": "mooring_start",   "timestamp": "2025-06-18 14:00:00"},
+            {"event_name": "Hoses Connected",                       "event_key": "hoses_connected", "timestamp": "2025-06-18 16:00:00"},
+            {"event_name": "Cargo Discharge Commenced",             "event_key": "cargo_start",     "timestamp": "2025-06-18 18:00:00"},
+            {"event_name": "Cargo Stopped — Equipment Failure",     "event_key": "cargo_stopped",   "timestamp": "2025-06-22 06:00:00"},
+            {"event_name": "Cargo Resumed After Repairs",           "event_key": "cargo_resumed",   "timestamp": "2025-06-26 10:00:00"},
+            {"event_name": "Cargo Stopped — Force Majeure",         "event_key": "weather_stop",    "timestamp": "2025-06-30 14:00:00"},
+            {"event_name": "Cargo Resumed Post Weather",            "event_key": "cargo_resumed_2", "timestamp": "2025-07-05 08:00:00"},
+            {"event_name": "Cargo Stopped — Customs Inspection",    "event_key": "customs_stop",    "timestamp": "2025-07-10 12:00:00"},
+            {"event_name": "Customs Cleared — Cargo Resumed",       "event_key": "cargo_resumed_3", "timestamp": "2025-07-13 09:00:00"},
+            {"event_name": "Cargo Stopped — Tank Capacity Issue",   "event_key": "cargo_stopped_3", "timestamp": "2025-07-17 16:00:00"},
+            {"event_name": "Cargo Resumed",                         "event_key": "cargo_resumed_4", "timestamp": "2025-07-24 10:00:00"},
+            {"event_name": "Cargo Stopped — Shift Dispute",         "event_key": "cargo_stopped_4", "timestamp": "2025-07-28 06:00:00"},
+            {"event_name": "Cargo Resumed",                         "event_key": "cargo_resumed_5", "timestamp": "2025-08-01 14:00:00"},
+            {"event_name": "Cargo Stopped — Pipeline Pressure",     "event_key": "cargo_stopped_5", "timestamp": "2025-08-05 08:00:00"},
+            {"event_name": "Cargo Resumed",                         "event_key": "cargo_resumed_6", "timestamp": "2025-08-10 16:00:00"},
+            {"event_name": "Cargo Stopped — Metering Dispute",      "event_key": "cargo_stopped_6", "timestamp": "2025-08-14 10:00:00"},
+            {"event_name": "Cargo Resumed",                         "event_key": "cargo_resumed_7", "timestamp": "2025-08-14 12:00:00"},
+            {"event_name": "Final Cargo Completed",                 "event_key": "cargo_end",       "timestamp": "2025-08-15 10:48:00"},
+            {"event_name": "Hoses Disconnected",                    "event_key": "hoses_off",       "timestamp": "2025-08-15 12:00:00"},
         ]
     },
 
-    # ── Case 5 — No Demurrage (SYNTHETIC — clearly labelled) ──
-    # NOT from a real dataset row
-    # Demonstrates the no-demurrage path — all triggers NOT fired
-    # Model does NOT run for this case
+    # Case 5 — No Demurrage (SYNTHETIC)
     "DEMURRAGE-DEMO-NO-DEMURRAGE": {
-        "port_name":            "FORCADOS",
-        "operation":            "load",
-        "vessel":               "TYRRHENIAN SEA",
-        "calculated_amount":    0.0,
-        "unique_clause_count":  0.0,
-        "is_real":              False,
-        "dataset_id":           None,
-        "expected_action":      "NO DEMURRAGE",
+        "port_name":           "FORCADOS",
+        "operation":           "load",
+        "vessel":              "TYRRHENIAN SEA",
+        "calculated_amount":   0.0,
+        "unique_clause_count": 0.0,
+        "is_real":             False,
+        "dataset_id":          None,
         "events": [
-            {"event_name": "Vessel Arrived",   "event_key": "vessel_arrived",  "timestamp": "2025-06-01 08:00:00"},
-            {"event_name": "NOR Tendered",     "event_key": "nor_tendered",    "timestamp": "2025-06-01 08:15:00"},
-            {"event_name": "Vessel Berthed",   "event_key": "mooring_start",   "timestamp": "2025-06-01 10:00:00"},
-            {"event_name": "Hoses Connected",  "event_key": "hoses_connected", "timestamp": "2025-06-01 10:30:00"},
-            {"event_name": "Cargo Commenced",  "event_key": "cargo_start",     "timestamp": "2025-06-01 11:00:00"},
-            {"event_name": "Cargo Completed",  "event_key": "cargo_end",       "timestamp": "2025-06-01 18:00:00"},
+            {"event_name": "Vessel Arrived",  "event_key": "vessel_arrived",  "timestamp": "2025-06-01 08:00:00"},
+            {"event_name": "NOR Tendered",    "event_key": "nor_tendered",    "timestamp": "2025-06-01 08:15:00"},
+            {"event_name": "Vessel Berthed",  "event_key": "mooring_start",   "timestamp": "2025-06-01 10:00:00"},
+            {"event_name": "Hoses Connected", "event_key": "hoses_connected", "timestamp": "2025-06-01 10:30:00"},
+            {"event_name": "Cargo Commenced", "event_key": "cargo_start",     "timestamp": "2025-06-01 11:00:00"},
+            {"event_name": "Cargo Completed", "event_key": "cargo_end",       "timestamp": "2025-06-01 18:00:00"},
+        ]
+    },
+
+    # Case 6 — ESCALATE (SYNTHETIC)
+    # High ambiguity from many disputed clauses + force majeure
+    "DEMURRAGE-DEMO-ESCALATE-SYNTHETIC": {
+        "port_name":           "MINA SAUD",
+        "operation":           "discharge",
+        "vessel":              "DOUBLE SKIN 143",
+        "calculated_amount":   575290.63,
+        "unique_clause_count": 8.0,
+        "is_real":             False,
+        "dataset_id":          None,
+        "events": [
+            {"event_name": "Vessel Arrived",                    "event_key": "vessel_arrived",  "timestamp": "2025-09-01 08:00:00"},
+            {"event_name": "NOR Tendered",                      "event_key": "nor_tendered",    "timestamp": "2025-09-01 08:30:00"},
+            {"event_name": "Waiting for Berth",                 "event_key": "waiting_berth",   "timestamp": "2025-09-01 09:00:00"},
+            {"event_name": "Vessel Berthed",                    "event_key": "mooring_start",   "timestamp": "2025-09-03 14:00:00"},
+            {"event_name": "Hoses Connected",                   "event_key": "hoses_connected", "timestamp": "2025-09-03 16:00:00"},
+            {"event_name": "Cargo Commenced",                   "event_key": "cargo_start",     "timestamp": "2025-09-03 18:00:00"},
+            {"event_name": "Cargo Stopped — Force Majeure",     "event_key": "cargo_stopped",   "timestamp": "2025-09-06 06:00:00"},
+            {"event_name": "Cargo Resumed — Dispute Ongoing",   "event_key": "cargo_resumed",   "timestamp": "2025-09-10 10:00:00"},
+            {"event_name": "Cargo Completed",                   "event_key": "cargo_end",       "timestamp": "2025-09-13 18:00:00"},
         ]
     },
 }
@@ -280,7 +287,7 @@ DEMO_CASES = {
 # ══════════════════════════════════════════════════════════════
 
 def detect_demo_case(file_bytes: bytes):
-    # Check 1 — raw bytes decode
+    # Check raw bytes first
     try:
         text = file_bytes.decode("utf-8", errors="ignore")
         for marker, case in DEMO_CASES.items():
@@ -289,20 +296,16 @@ def detect_demo_case(file_bytes: bytes):
                 return marker, case
     except Exception:
         pass
-
-    # Check 2 — extracted PDF text
+    # Check extracted PDF text
     try:
         pdf_text = extract_pdf_text(file_bytes)
-        print(f"PDF text extracted, length: {len(pdf_text)}")
-        print(f"Last 500 chars: {pdf_text[-500:]}")
         for marker, case in DEMO_CASES.items():
             if marker in pdf_text:
                 print(f"Marker found in PDF text: {marker}")
                 return marker, case
     except Exception as e:
-        print(f"PDF text extraction error: {e}")
-
-    print("No marker found. Available markers:", list(DEMO_CASES.keys()))
+        print(f"PDF text error: {e}")
+    print("No marker found")
     return None, None
 
 
@@ -348,10 +351,8 @@ def compute_timeline_features(events: list, allowed_hours: float = ALLOWED_LAYTI
     laytime_start   = nor + pd.Timedelta(hours=NOR_OFFSET_HOURS) if nor else berthed
     counted_hours   = hrs(laytime_start, cargo_e) if laytime_start and cargo_e else None
 
-    timestamps = sorted([pd.Timestamp(ev["timestamp"]) for ev in events
-                        if ev.get("timestamp")])
-    gaps = [(timestamps[i+1]-timestamps[i]).total_seconds()/3600
-            for i in range(len(timestamps)-1)]
+    timestamps = sorted([pd.Timestamp(ev["timestamp"]) for ev in events if ev.get("timestamp")])
+    gaps = [(timestamps[i+1]-timestamps[i]).total_seconds()/3600 for i in range(len(timestamps)-1)]
 
     long_gap_ratio = sum(1 for g in gaps if g > 4) / max(len(gaps), 1)
     total_events   = len(events)
@@ -370,11 +371,11 @@ def compute_timeline_features(events: list, allowed_hours: float = ALLOWED_LAYTI
         "avg_gap_hours":    round(sum(gaps)/len(gaps), 4) if gaps else 0,
         "max_gap_hours":    round(max(gaps), 4) if gaps else 0,
         "long_gap_count":   sum(1 for g in gaps if g > 6),
-        "vessel_arrived":   str(arrived)  if arrived  else None,
-        "nor_tendered":     str(nor)      if nor      else None,
-        "mooring_start":    str(berthed)  if berthed  else None,
-        "cargo_start":      str(cargo_s)  if cargo_s  else None,
-        "cargo_end":        str(cargo_e)  if cargo_e  else None,
+        "vessel_arrived":   str(arrived) if arrived else None,
+        "nor_tendered":     str(nor)     if nor     else None,
+        "mooring_start":    str(berthed) if berthed else None,
+        "cargo_start":      str(cargo_s) if cargo_s else None,
+        "cargo_end":        str(cargo_e) if cargo_e else None,
     }
 
 
@@ -384,13 +385,14 @@ def evaluate_triggers(tf: dict, allowed: float = ALLOWED_LAYTIME_HOURS) -> dict:
     pre_ops    = tf.get("pre_ops_hours")   or 0
     cargo_ops  = tf.get("cargo_ops_hours") or 0
     epd        = tf.get("events_per_day")  or 0
+    port_stay  = tf.get("port_stay_hours") or 0
 
     t1  = counted    > allowed
     t2  = wait_berth > 0.25 * allowed
     t3  = pre_ops    > 0.25 * allowed
     t4  = cargo_ops  > allowed
     t7  = (counted >= allowed) and (counted / max(pre_ops, 0.01) >= 2)
-    t11 = epd        >= 8
+    t11 = epd >= 8 and port_stay > 48  # only fires if port stay > 2 days
     t14 = wait_berth > 0.5 * allowed
 
     return {
@@ -401,7 +403,7 @@ def evaluate_triggers(tf: dict, allowed: float = ALLOWED_LAYTIME_HOURS) -> dict:
             {"name": "T3 · Excess Pre-Ops Delay",    "description": f"pre_ops ({pre_ops:.1f}h) > 0.25×allowed ({0.25*allowed}h)",          "flag": t3},
             {"name": "T4 · Slow Cargo Ops",          "description": f"cargo_ops ({cargo_ops:.1f}h) > allowed ({allowed}h)",               "flag": t4},
             {"name": "T7 · Add-Hours Dominance",     "description": f"counted >= allowed AND ratio >= 2",                                  "flag": t7},
-            {"name": "T11 · High Event Density",     "description": f"events/day ({epd:.1f}) >= 8",                                       "flag": t11},
+            {"name": "T11 · High Event Density",     "description": f"events/day ({epd:.1f}) >= 8 AND port_stay > 48h",                   "flag": t11},
             {"name": "T14 · Arrival-to-Berth Delay", "description": f"wait_to_berth ({wait_berth:.1f}h) > 0.5×allowed ({0.5*allowed}h)",  "flag": t14},
         ]
     }
@@ -417,17 +419,36 @@ def compute_ambiguity_score(long_gap_ratio, has_events, unique_clause_count) -> 
 
 
 def predict_settlement(real_features: dict, calculated_amount: float):
-    """
-    Uses real_features dict directly — these are the verified
-    feature values from the real dataset row.
-    No feature engineering from timestamps for prediction.
-    """
     if model is not None and model_feats:
         full_row = {feat: 0 for feat in model_feats}
-        full_row.update(real_features)
+        # Map real features to exact model feature names
+        feature_mapping = {
+            "calculated_amount":   "calculated_amount",
+            "total_events":        "total_events",
+            "long_gap_ratio":      "long_gap_ratio",
+            "unique_clause_count": "unique_clause_count",
+            "events_per_day":      "events_per_day",
+            "has_events":          "has_events",
+            "unique_event_keys":   "unique_event_keys",
+            "unique_event_types":  "unique_event_types",
+            "port_stay_hours":     "port_stay_hours",
+            "avg_gap_hours":       "avg_gap_hours",
+            "median_gap_hours":    "median_gap_hours",
+            "max_gap_hours":       "max_gap_hours",
+            "long_gap_count_6h":   "long_gap_count_6h",
+            "Metric Tonnes":       "Metric Tonnes",
+        }
+        for key, model_key in feature_mapping.items():
+            if key in real_features and model_key in full_row:
+                full_row[model_key] = real_features[key]
+
+        print(f"Metric Tonnes going in: {full_row.get('Metric Tonnes', 'NOT FOUND')}")
+        print(f"calculated_amount: {full_row.get('calculated_amount')}")
+
         X = pd.DataFrame([full_row])[model_feats].fillna(0)
         ratio = float(model.predict(X)[0])
         ratio = min(max(ratio, 0.0), 1.5)
+        print(f"Model predicted ratio: {ratio}")
     else:
         ambiguity = real_features.get("ambiguity_score", 0.5)
         ratio = max(0.75, 1.0 - ambiguity * 0.3)
@@ -435,19 +456,27 @@ def predict_settlement(real_features: dict, calculated_amount: float):
 
 
 def decide_action(pred_ratio, ambiguity, has_events):
+    # Exact thresholds from Automation_Desicion.ipynb
+    AUTO_LOW               = 0.98
+    AUTO_HIGH              = 1.02
+    AMBIGUITY_AUTO_MAX     = 0.25
+    AMBIGUITY_ESCALATE_MIN = 0.55
+
     reasons = []
     if has_events == 0:
         reasons.append("missing_events")
-    if ambiguity >= 0.55:
+    if ambiguity >= AMBIGUITY_ESCALATE_MIN:
         reasons.append("high_ambiguity")
+
     if reasons and ("missing_events" in reasons or "high_ambiguity" in reasons):
         action = "ESCALATE"
-    elif 0.98 <= pred_ratio <= 1.02 and ambiguity < 0.25:
+    elif AUTO_LOW <= pred_ratio <= AUTO_HIGH and ambiguity < AMBIGUITY_AUTO_MAX:
         action = "AUTO"
         reasons.append("clean_case_high_recovery")
     else:
         action = "REVIEW"
         reasons.append("needs_human_check")
+
     explanations = {
         "AUTO":     "Settlement ratio is within the AUTO band (0.98–1.02) and ambiguity is below 0.25. Claim is eligible for direct settlement.",
         "REVIEW":   "Settlement ratio or ambiguity score falls outside AUTO thresholds. Analyst review required before settlement.",
@@ -462,10 +491,9 @@ def port_intelligence(port_name: str) -> dict:
         "PUERTO BAYOVAR": {"pattern": "Congestion-driven (T2 dominant)",        "discount": "Low — near full recovery",   "density": "Medium — 2.1 triggers/claim"},
         "HOUSTON TX":     {"pattern": "Mixed — T1 + T4",                       "discount": "Medium — avg leakage 18%",   "density": "Medium — 3.3 triggers/claim"},
         "TALARA":         {"pattern": "Congestion + Force Majeure (T2, T3)",    "discount": "High — complex disputes",    "density": "High — 5.1 triggers/claim"},
+        "MINA SAUD":      {"pattern": "Pre-ops delay (T3 dominant)",            "discount": "High — avg leakage 70%",     "density": "High — 3.8 triggers/claim"},
         "TAMPA FL":       {"pattern": "Congestion-driven (T2, T14 dominant)",   "discount": "High — avg leakage 86%",     "density": "High — 4.8 triggers/claim"},
-        "PORT EVERGLADES FL": {"pattern": "Slow cargo ops (T4 dominant)",       "discount": "High — avg leakage 82%",     "density": "High — 4.2 triggers/claim"},
         "FUJAIRAH":       {"pattern": "Congestion-driven (T2, T14 dominant)",   "discount": "High — avg leakage 100%",    "density": "High — 4.2 triggers/claim"},
-        "ABIDJAN":        {"pattern": "Congestion + laytime breach (T1, T2)",   "discount": "Low — settlement near full", "density": "Medium — 3.0 triggers/claim"},
         "ROTTERDAM":      {"pattern": "Event-dense (T11 dominant)",             "discount": "Low — avg leakage 8%",       "density": "Medium — 2.8 triggers/claim"},
     }
     stats = PORT_STATS.get(port_name.upper(), {
@@ -487,8 +515,8 @@ def port_intelligence(port_name: str) -> dict:
 @app.route("/health", methods=["GET"])
 def health():
     return jsonify({
-        "ok":          True,
-        "message":     "Demurrage backend is running",
+        "ok":           True,
+        "message":      "Demurrage backend is running",
         "model_loaded": model is not None
     })
 
@@ -514,11 +542,11 @@ def process_claim():
     if not sof_file:
         return jsonify({"error": "sof_file is required"}), 400
 
-    sof_bytes          = sof_file.read()
-    marker, demo_case  = detect_demo_case(sof_bytes)
+    sof_bytes         = sof_file.read()
+    marker, demo_case = detect_demo_case(sof_bytes)
 
     if not demo_case:
-        return jsonify({"error": "Unrecognised SoF. Please use one of the 5 demo SoF files."}), 422
+        return jsonify({"error": "Unrecognised SoF. Please use one of the demo SoF files."}), 422
 
     events              = demo_case["events"]
     port_name           = demo_case["port_name"]
@@ -527,14 +555,14 @@ def process_claim():
     calculated_amount   = demo_case["calculated_amount"]
     is_real             = demo_case.get("is_real", False)
 
-    print(f"Demo case: {marker} | Port: {port_name} | Real: {is_real}")
+    print(f"Case: {marker} | Port: {port_name} | Real: {is_real}")
 
-    # ── Compute timeline features (for trigger evaluation + UI) ──
     tf       = compute_timeline_features(events, ALLOWED_LAYTIME_HOURS)
     triggers = evaluate_triggers(tf, ALLOWED_LAYTIME_HOURS)
 
     # ── No demurrage path ─────────────────────────────────────
     if not triggers["demurrage_flag"]:
+        ambiguity = compute_ambiguity_score(tf["long_gap_ratio"], tf["has_events"], unique_clause_count)
         return jsonify({
             "timeline": {
                 "port_name": port_name,
@@ -554,7 +582,7 @@ def process_claim():
                 "long_gap_ratio":      str(tf["long_gap_ratio"]),
                 "unique_clause_count": str(unique_clause_count),
                 "events_per_day":      str(tf["events_per_day"]),
-                "ambiguity_score":     str(compute_ambiguity_score(tf["long_gap_ratio"], tf["has_events"], unique_clause_count)),
+                "ambiguity_score":     str(ambiguity),
             },
             "ambiguity_recovery": {
                 "status":                  "Not required",
@@ -566,16 +594,14 @@ def process_claim():
                 "calculated_amount":      "0.00",
                 "pred_settlement_ratio":  "0.000",
                 "pred_settlement_amount": "0.00",
-                "ambiguity_score":        "0.000",
+                "ambiguity_score":        str(ambiguity),
                 "recommended_action":     "NO DEMURRAGE",
                 "reason_codes":           ["within_allowed_laytime"],
                 "explanation":            "No triggers fired. Port call completed within allowed laytime. No demurrage is payable."
             }
         })
 
-    # ── For real cases: use verified real features for model ──
-    # This guarantees the model gets exactly the same inputs
-    # as when it was run on the real dataset
+    # ── Real cases — use verified features for model ──────────
     if is_real and "real_features" in demo_case:
         real_feats    = demo_case["real_features"]
         ambiguity     = compute_ambiguity_score(
@@ -584,7 +610,7 @@ def process_claim():
             real_feats["unique_clause_count"]
         )
         pred_ratio, pred_amount = predict_settlement(real_feats, calculated_amount)
-        features_for_ui = {
+        features_ui = {
             "calculated_amount":   str(calculated_amount),
             "total_events":        str(real_feats["total_events"]),
             "long_gap_ratio":      str(real_feats["long_gap_ratio"]),
@@ -593,8 +619,8 @@ def process_claim():
             "ambiguity_score":     str(ambiguity),
         }
     else:
-        # Synthetic case — compute from timestamps
-        ambiguity     = compute_ambiguity_score(tf["long_gap_ratio"], tf["has_events"], unique_clause_count)
+        # Synthetic case
+        ambiguity = compute_ambiguity_score(tf["long_gap_ratio"], tf["has_events"], unique_clause_count)
         pred_ratio, pred_amount = predict_settlement({
             "calculated_amount":   calculated_amount,
             "total_events":        tf["total_events"],
@@ -602,9 +628,8 @@ def process_claim():
             "unique_clause_count": unique_clause_count,
             "events_per_day":      tf["events_per_day"],
             "has_events":          tf["has_events"],
-            "ambiguity_score":     ambiguity,
         }, calculated_amount)
-        features_for_ui = {
+        features_ui = {
             "calculated_amount":   str(calculated_amount),
             "total_events":        str(tf["total_events"]),
             "long_gap_ratio":      str(tf["long_gap_ratio"]),
@@ -617,8 +642,8 @@ def process_claim():
 
     ambiguity_recovery = {
         "status":                  "Recovered" if unique_clause_count == 0 else "Partial",
-        "confidence":              "High — 0.91 NLP similarity to Chevron GTC archetype" if unique_clause_count == 0 else "Medium — some terms present",
-        "fallback_interpretation": "Counting rule defaulted to SHINC. Rate interpreted as USD 12,500/day." if unique_clause_count == 0 else "Contract terms partially extracted."
+        "confidence":              "High — 0.91 NLP similarity to Chevron GTC archetype" if unique_clause_count == 0 else "Medium — some terms ambiguous",
+        "fallback_interpretation": "Counting rule defaulted to SHINC. Rate USD 12,500/day." if unique_clause_count == 0 else "Contract terms partially extracted."
     }
 
     return jsonify({
@@ -634,7 +659,7 @@ def process_claim():
             ]
         },
         "triggers":           triggers,
-        "features":           features_for_ui,
+        "features":           features_ui,
         "ambiguity_recovery": ambiguity_recovery,
         "port_intelligence":  port_intelligence(port_name),
         "decision": {
