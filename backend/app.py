@@ -620,7 +620,7 @@ def process_claim():
         })
 
     # ── Real cases — use verified features for model ──────────
-    if is_real and "real_features" in demo_case:
+    if "real_features" in demo_case:
         real_feats    = demo_case["real_features"]
         ambiguity     = compute_ambiguity_score(
             real_feats["long_gap_ratio"],
