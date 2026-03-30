@@ -2,7 +2,7 @@
 // Demurrage Settlement Intelligence — app.js
 // ============================================================
 
-const RAILWAY_URL = "https://f4df-2-56-190-10.ngrok-free.app";
+const RAILWAY_URL = "https://a840-2-56-190-10.ngrok-free.app";
 
 // ── Utility ──────────────────────────────────────────────────
 function escapeHtml(text) {
