@@ -420,20 +420,37 @@ def compute_ambiguity_score(long_gap_ratio, has_events, unique_clause_count) -> 
 
 def predict_settlement(real_features: dict, calculated_amount: float):
     if model is not None and model_feats:
-        full_row = {feat: 0 for feat in model_feats}
-        full_row.update(real_features)
+        # Build row with zeros for all model features
+        full_row = {}
+        for feat in model_feats:
+            full_row[feat] = 0
 
-        print("Features going into model (non-zero):")
-        for col in model_feats:
-            val = full_row.get(col, 0)
-            if val != 0:
-                print(f"  {col}: {val}")
+        # Manually set each real feature
+        full_row["calculated_amount"]   = real_features.get("calculated_amount", 0)
+        full_row["total_events"]        = real_features.get("total_events", 0)
+        full_row["long_gap_ratio"]      = real_features.get("long_gap_ratio", 0)
+        full_row["unique_clause_count"] = real_features.get("unique_clause_count", 0)
+        full_row["events_per_day"]      = real_features.get("events_per_day", 0)
+        full_row["has_events"]          = real_features.get("has_events", 0)
+        full_row["unique_event_keys"]   = real_features.get("unique_event_keys", 0)
+        full_row["unique_event_types"]  = real_features.get("unique_event_types", 0)
+        full_row["port_stay_hours"]     = real_features.get("port_stay_hours", 0)
+        full_row["avg_gap_hours"]       = real_features.get("avg_gap_hours", 0)
+        full_row["median_gap_hours"]    = real_features.get("median_gap_hours", 0)
+        full_row["max_gap_hours"]       = real_features.get("max_gap_hours", 0)
+        full_row["long_gap_count_6h"]   = real_features.get("long_gap_count_6h", 0)
+        full_row["Metric Tonnes"]       = real_features.get("Metric Tonnes", 0)
+
+        print("Non-zero features going into model:")
+        for k, v in full_row.items():
+            if v != 0:
+                print(f"  {k}: {v}")
 
         X = pd.DataFrame([full_row])[model_feats].fillna(0)
         ratio = float(model.predict(X)[0])
         ratio = min(max(ratio, 0.0), 1.5)
         print(f"Model predicted ratio: {ratio}")
-        print(f"Action would be: {'AUTO' if 0.98 <= ratio <= 1.02 else 'REVIEW'}")
+        print(f"Action: {'AUTO' if 0.98 <= ratio <= 1.02 else 'REVIEW'}")
     else:
         ambiguity = real_features.get("ambiguity_score", 0.5)
         ratio = max(0.75, 1.0 - ambiguity * 0.3)
